@@ -14,18 +14,16 @@ def load_data(file_name, columns):
     return pd.DataFrame(columns=columns)
 
 # পেজ সেটআপ
-st.set_page_config(page_title="Sun Rise K.G. Admin", layout="wide", page_icon="🏫")
+st.set_page_config(page_title="Sun Rise K.G. Master Pro", layout="wide", page_icon="🏫")
 
-# --- প্রিমিয়াম ডিজাইন (CSS) ---
+# --- কাস্টম প্রিমিয়াম স্টাইল ---
 st.markdown("""
     <style>
-    .main { background-color: #f0f4f8; }
-    .stMetric { background: linear-gradient(135deg, #ffffff 0%, #e3e9f3 100%); padding: 20px; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.05); border-top: 4px solid #002D62; }
-    .card { background-color: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); margin-bottom: 20px; }
-    .stButton>button { border-radius: 8px; font-weight: bold; transition: 0.3s; }
-    .stButton>button:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    /* প্রিন্ট সেকশন স্টাইল */
-    @media print { .no-print { display: none !important; } .print-only { display: block !important; } }
+    .main { background-color: #f4f7f6; }
+    .stMetric { background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 5px solid #002D62; }
+    .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 20px; }
+    .sidebar .sidebar-content { background: #002D62; color: white; }
+    h1, h2, h3 { color: #002D62; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -34,85 +32,90 @@ if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
 
 if not st.session_state['logged_in']:
-    col1, col2, col3 = st.columns([1, 1.5, 1])
+    col1, col2, col3 = st.columns([1, 1.2, 1])
     with col2:
-        st.markdown("<div style='text-align: center; margin-top: 50px;'>", unsafe_allow_html=True)
-        # আপনার লোগো এখানে (GitHub এ আপলোড করা লোগোর লিঙ্ক দিতে পারেন)
-        st.image("https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg", width=180) 
-        st.markdown("<h2 style='color: #002D62;'>সানরাইজ কিন্ডারগার্টেন অ্যাডমিন</h2>", unsafe_allow_html=True)
-        user = st.text_input("ইউজারনেম", placeholder="Admin ID")
-        pw = st.text_input("পাসওয়ার্ড", type="password", placeholder="Password")
+        st.markdown("<div class='card' style='text-align: center; margin-top: 50px;'>", unsafe_allow_html=True)
+        st.image("https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg", width=150)
+        st.header("Admin Login")
+        user = st.text_input("Username")
+        pw = st.text_input("Password", type="password")
         if st.button("লগইন করুন", use_container_width=True):
             if user == "admin" and pw == "12345":
                 st.session_state['logged_in'] = True
                 st.rerun()
-            else:
-                st.error("ভুল তথ্য দেওয়া হয়েছে")
+            else: st.error("তথ্য ভুল!")
+        st.markdown("</div>", unsafe_allow_html=True)
     st.stop()
 
-# --- সাইডবার ---
-st.sidebar.image("https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg", width=120)
-st.sidebar.markdown("<h2 style='text-align: center;'>অ্যাডমিন প্যানেল</h2>", unsafe_allow_html=True)
-menu = ["🏠 ড্যাশবোর্ড", "📝 ভর্তি ফরম", "👥 শিক্ষার্থী তালিকা", "🎓 রেজাল্ট শিট", "🎟️ এডমিট কার্ড", "💰 ফিস কালেকশন"]
-choice = st.sidebar.selectbox("মেনু নির্বাচন করুন", menu)
+# --- সাইডবার ও নেভিগেশন ---
+st.sidebar.image("https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg", width=100)
+st.sidebar.title("Sun Rise K.G.")
+menu = ["📊 ড্যাশবোর্ড", "📝 স্টুডেন্ট ভর্তি", "👥 ছাত্র-ছাত্রী তালিকা", "✅ হাজিরা", "🎓 রেজাল্ট ও মার্কশিট", "🎟️ এডমিট কার্ড", "💰 ফিস কালেকশন"]
+choice = st.sidebar.radio("মেনু নির্বাচন করুন", menu)
 
-STD_COLS = ["ID", "Name_BN", "Name_EN", "Class", "Phone", "Father", "Address", "Admission_Date"]
+STD_COLS = ["ID", "Name_BN", "Name_EN", "Father_BN", "Mother_BN", "F_Job", "Class", "DOB", "Mobile", "Address", "Date"]
 
 # --- ১. ড্যাশবোর্ড ---
-if choice == "🏠 ড্যাশবোর্ড":
-    st.title("📊 স্কুল ওভারভিউ")
+if choice == "📊 ড্যাশবোর্ড":
+    st.title("🏫 স্কুল ম্যানেজমেন্ট ড্যাশবোর্ড")
     df = load_data("students.csv", STD_COLS)
     
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("মোট শিক্ষার্থী", len(df))
-    c2.metric("শ্রেণী সংখ্যা", "৬টি")
-    c3.metric("শিক্ষক সংখ্যা", "৪ জন")
-    c4.metric("প্রতিষ্ঠিত", "২০২৫ খ্রিঃ")
-    
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("মোট শিক্ষার্থী", len(df))
+    col2.metric("আজকের তারিখ", date.today().strftime("%d %b, %y"))
+    col3.metric("টিচার্স", "৪ জন")
+    col4.metric("অবস্থান", "হূমাইপুর")
+
     st.markdown("---")
-    col_l, col_r = st.columns([2, 1])
-    with col_l:
-        st.markdown("<div class='card'><h3>📈 শিক্ষার্থী ডিস্ট্রিবিউশন</h3>", unsafe_allow_html=True)
+    c_l, c_r = st.columns([2, 1])
+    with c_l:
+        st.markdown("<div class='card'><h3>📈 শ্রেণীভিত্তিক পরিসংখ্যান</h3>", unsafe_allow_html=True)
         if not df.empty:
-            fig = px.pie(df, names='Class', hole=.4, color_discrete_sequence=px.colors.qualitative.Set3)
+            fig = px.bar(df, x='Class', color='Class', title="Students by Class")
             st.plotly_chart(fig, use_container_width=True)
-        else: st.info("কোনো ডাটা নেই")
+        else: st.info("কোনো ডাটা নেই।")
         st.markdown("</div>", unsafe_allow_html=True)
     
-    with col_r:
-        st.markdown("<div class='card'><h3>📅 আজকের আপডেট</h3>", unsafe_allow_html=True)
-        st.info(f"তারিখ: {date.today().strftime('%d %B, %Y')}")
-        st.write("✅ সার্ভার অনলাইন")
-        st.write("✅ ডাটাবেস ব্যাকআপ রেডি")
+    with c_r:
+        st.markdown("<div class='card'><h3>🔔 নোটিশ বোর্ড</h3>", unsafe_allow_html=True)
+        st.success("✅ ২০২৫ শিক্ষাবর্ষের ভর্তি চলছে।")
+        st.warning("⚠️ আগামী বুধবার মিটিং অনুষ্ঠিত হবে।")
         st.markdown("</div>", unsafe_allow_html=True)
 
-# --- ২. ভর্তি ফরম ---
-elif choice == "📝 ভর্তি ফরম":
+# --- ২. ভর্তি ফরম (আপনার ছবির নমুনা অনুযায়ী) ---
+elif choice == "📝 স্টুডেন্ট ভর্তি":
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.header("📝 ডিজিটাল ভর্তি আবেদন ফরম")
-    with st.form("admission_form", clear_on_submit=True):
-        c1, c2 = st.columns(2)
-        n_bn = c1.text_input("১। শিক্ষার্থীর নাম (বাংলা)")
-        n_en = c2.text_input("Student Name (English Block)")
-        f_bn = c1.text_input("২। পিতার নাম (বাংলা)")
-        f_en = c2.text_input("Father's Name (English Block)")
-        s_class = c1.selectbox("১১। ভর্তির শ্রেণী", ["Play", "Nursery", "One", "Two", "Three", "Four", "Five"])
-        phone = c2.text_input("মোবাইল নম্বর")
-        addr = st.text_area("৫। ঠিকানা")
+    st.header("📝 ভর্তি আবেদন ফরম")
+    with st.form("admission", clear_on_submit=True):
+        col1, col2 = st.columns(2)
+        with col1:
+            n_bn = st.text_input("১। শিক্ষার্থীর নাম (বাংলা)")
+            f_bn = st.text_input("২। পিতার নাম (বাংলা)")
+            m_bn = st.text_input("৪। মাতার নাম (বাংলা)")
+            f_job = st.text_input("৬। পিতার পেশা")
+            s_class = st.selectbox("শ্রেণী", ["Play", "Nursery", "One", "Two", "Three", "Four", "Five"])
+        with col2:
+            n_en = st.text_input("Name (English Block)")
+            f_en = st.text_input("Father's Name (Block)")
+            m_en = st.text_input("Mother's Name (Block)")
+            dob = st.date_input("৭। জন্ম তারিখ")
+            mobile = st.text_input("মোবাইল নম্বর")
         
-        if st.form_submit_button("আবেদন সেভ করুন"):
+        addr = st.text_area("৫। ঠিকানা (গ্রাম, ডাকঘর, উপজেলা, জেলা)")
+        
+        if st.form_submit_button("ভর্তি সম্পন্ন করুন"):
             df = load_data("students.csv", STD_COLS)
-            new_id = 202600 + len(df) + 1
-            new_row = pd.DataFrame([[new_id, n_bn, n_en, s_class, phone, f_bn, addr, str(date.today())]], columns=STD_COLS)
+            new_id = 202500 + len(df) + 1
+            new_row = pd.DataFrame([[new_id, n_bn, n_en, f_bn, m_bn, f_job, s_class, str(dob), mobile, addr, str(date.today())]], columns=STD_COLS)
             df = pd.concat([df, new_row], ignore_index=True)
             df.to_csv("students.csv", index=False)
-            st.success(f"সফলভাবে নিবন্ধিত! আইডি: {new_id}")
             st.balloons()
+            st.success(f"সাফল্যজনক ভর্তি! আইডি: {new_id}")
     st.markdown("</div>", unsafe_allow_html=True)
 
-# --- ৩. শিক্ষার্থী তালিকা (এডিট/ডিলিট/প্রিন্ট) ---
-elif choice == "👥 শিক্ষার্থী তালিকা":
-    st.header("👥 সকল শিক্ষার্থীর ডাটাবেস")
+# --- ৩. এডিট ও ডিলিট ম্যানেজমেন্ট ---
+elif choice == "👥 ছাত্র-ছাত্রী তালিকা":
+    st.header("👥 শিক্ষার্থীর তথ্য ম্যানেজমেন্ট")
     df = load_data("students.csv", STD_COLS)
     
     search = st.text_input("🔍 নাম বা আইডি দিয়ে খুঁজুন")
@@ -121,43 +124,38 @@ elif choice == "👥 শিক্ষার্থী তালিকা":
     
     st.dataframe(df, use_container_width=True)
     
-    if st.button("📥 ডাটা এক্সেল ফাইল হিসেবে ডাউনলোড করুন"):
-        df.to_csv("students_export.csv", index=False)
-        st.download_button(label="Click to Download", data=df.to_csv(), file_name="students_list.csv")
+    st.markdown("---")
+    st.subheader("🗑️ তথ্য সংশোধন বা ডিলিট")
+    del_id = st.number_input("আইডি দিন", min_value=0)
+    if st.button("মুছে ফেলুন"):
+        df = df[df['ID'] != del_id]
+        df.to_csv("students.csv", index=False)
+        st.warning(f"আইডি {del_id} মুছে ফেলা হয়েছে।")
+        st.rerun()
 
-# --- ৪. এডমিট কার্ড (প্রিন্ট ফরম্যাট) ---
+# --- ৪. এডমিট কার্ড প্রিন্ট ---
 elif choice == "🎟️ এডমিট কার্ড":
     st.header("🎟️ প্রবেশ পত্র জেনারেটর")
-    target_id = st.number_input("শিক্ষার্থীর আইডি দিন", min_value=0)
+    a_id = st.number_input("আইডি দিন", min_value=0)
     df = load_data("students.csv", STD_COLS)
-    
-    if st.button("এডমিট কার্ড তৈরি করুন"):
-        student = df[df['ID'] == target_id]
-        if not student.empty:
-            s = student.iloc[0]
+    if st.button("তৈরি করুন"):
+        std = df[df['ID'] == a_id]
+        if not std.empty:
+            s = std.iloc[0]
             st.markdown(f"""
-            <div style="border: 4px solid #002D62; padding: 20px; width: 500px; margin: auto; background: white; font-family: sans-serif;">
-                <table style="width: 100%;">
-                    <tr>
-                        <td style="width: 80px;"><img src="https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg" width="70"></td>
-                        <td style="text-align: center;">
-                            <h2 style="margin: 0; color: #002D62;">Sun Rise Kinder Garten</h2>
-                            <p style="margin: 0; font-size: 14px;">হূমাইপুর, বাজিতপুর, কিশোরগঞ্জ</p>
-                        </td>
-                    </tr>
-                </table>
-                <h3 style="text-align: center; border-bottom: 2px solid #002D62; padding-bottom: 5px;">ADMIT CARD</h3>
-                <p><b>নাম:</b> {s['Name_BN']}</p>
-                <p><b>আইডি:</b> {s['ID']} | <b>শ্রেণী:</b> {s['Class']}</p>
-                <p><b>পরীক্ষা:</b> বার্ষিক পরীক্ষা - ২০২৬</p>
-                <div style="margin-top: 40px; display: flex; justify-content: space-between;">
-                    <span>_________________<br>অধ্যক্ষের স্বাক্ষর</span>
-                    <span>_________________<br>অভিভাবকের স্বাক্ষর</span>
+            <div style="border: 5px solid #002D62; padding: 20px; width: 500px; margin: auto; background: white;">
+                <div style="text-align: center;">
+                    <img src="https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg" width="80">
+                    <h2 style="margin: 0;">Sun Rise Kinder Garten</h2>
+                    <p>স্থাপিত: ২০২৫ খ্রিঃ</p>
                 </div>
+                <hr>
+                <p><b>আইডি:</b> {s['ID']} | <b>শ্রেণী:</b> {s['Class']}</p>
+                <p><b>নাম:</b> {s['Name_BN']}</p>
+                <p><b>পরীক্ষা:</b> বার্ষিক পরীক্ষা - ২০২৬</p>
             </div>
-            <p style='text-align:center; color:gray; font-size:12px;'>কীবোর্ড থেকে Ctrl + P চেপে প্রিন্ট করুন</p>
             """, unsafe_allow_html=True)
-        else: st.error("এই আইডি পাওয়া যায়নি।")
+        else: st.error("আইডি পাওয়া যায়নি।")
 
 # লগআউট
 if st.sidebar.button("Logout"):
