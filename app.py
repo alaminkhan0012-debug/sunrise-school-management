@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import os
 from datetime import date
-import plotly.express as px
 
 # ডাটাবেস হ্যান্ডলিং
 def load_data(file_name, columns):
@@ -14,88 +13,132 @@ def load_data(file_name, columns):
     return pd.DataFrame(columns=columns)
 
 # পেজ কনফিগারেশন
-st.set_page_config(page_title="Sun Rise Kinder Garten", layout="wide", page_icon="🏫")
+st.set_page_config(page_title="Sun Rise Kinder Garten", layout="wide")
 
-# --- কাস্টম সিএসএস (ckgghs.edu.bd এর মতো লুক দিতে) ---
+# --- কাস্টম ডিজাইন (CSS) ---
 st.markdown("""
     <style>
-    .header-box { background-color: #002D62; padding: 20px; color: white; text-align: center; border-radius: 10px; margin-bottom: 20px; }
-    .marquee-text { background: #FFD700; padding: 10px; font-weight: bold; color: #000; border-radius: 5px; }
-    .stMetric { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 5px solid #002D62; }
+    .header { background: #fff; padding: 10px; border-bottom: 3px solid red; display: flex; align-items: center; }
+    .school-name { color: red; font-size: 30px; font-weight: bold; margin-left: 20px; }
+    .nav-bar { background: #f8f9fa; padding: 10px; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+    .notice-board { background: #76ba1b; color: white; padding: 10px; border-radius: 5px; }
+    .footer { background: #1a1a1a; color: white; padding: 40px; margin-top: 50px; }
+    .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     </style>
     """, unsafe_allow_html=True)
 
-# --- হেডার সেকশন ---
+# --- হেডার সেকশন (Screenshot_8 এর মতো) ---
 st.markdown(f"""
-    <div class="header-box">
-        <img src="https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg" width="100">
-        <h1>সানরাইজ কিন্ডারগার্টেন</h1>
-        <p>স্থাপিত: ২০২৫ খ্রিঃ | হূমাইপুর, বাজিতপুর, কিশোরগঞ্জ</p>
+    <div class="header">
+        <img src="https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg" width="80">
+        <div class="school-name">সানরাইজ কিন্ডারগার্টেন <br> <span style="font-size:18px; color:green;">SUN RISE KINDER GARTEN</span></div>
     </div>
     """, unsafe_allow_html=True)
 
-# স্ক্রলিং নোটিশ
-st.markdown('<div class="marquee-text"><marquee>২০২৫ শিক্ষাবর্ষের ভর্তি চলছে... নতুন রুটিন প্রকাশিত হয়েছে... বার্ষিক ক্রীড়া প্রতিযোগিতা আগামী মাসে অনুষ্ঠিত হবে...</marquee></div>', unsafe_allow_html=True)
-
 # --- সাইডবার মেনু ---
-st.sidebar.title("মেইন মেনু")
-menu = ["🏠 হোম পেজ", "📝 অনলাইন ভর্তি", "🎓 রেজাল্ট", "🎟️ এডমিট কার্ড", "👤 অ্যাডমিন লগইন"]
-choice = st.sidebar.radio("বিভাগ নির্বাচন করুন", menu)
+st.sidebar.image("https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg", width=100)
+menu = ["🏠 হোম পেজ", "📝 অনলাইন ভর্তি", "🎓 রেজাল্ট", "🎟️ এডমিট কার্ড", "🔐 অ্যাডমিন প্যানেল"]
+choice = st.sidebar.radio("Main Menu", menu)
 
 STD_COLS = ["ID", "Name_BN", "Name_EN", "Father_BN", "Mother_BN", "Class", "Phone", "Address", "Date"]
 
-# --- ১. হোম পেজ (পাবলিক ভিউ) ---
+# --- ১. হোম পেজ (Screenshot_8 & 10 অনুযায়ী) ---
 if choice == "🏠 হোম পেজ":
-    st.title("স্বাগতম!")
-    col1, col2 = st.columns([2, 1])
+    # স্লাইডার ইমেজ
+    st.image("https://ckgghs.edu.bd/uploads/sliders/1709444391.jpg", use_container_width=True)
     
-    with col1:
-        st.markdown("<div class='card'><h3>স্কুল পরিচিতি</h3><p>শিক্ষাই শক্তি, জ্ঞানই আলো - এই স্লোগানকে সামনে রেখে আমাদের পথচলা। সানরাইজ কিন্ডারগার্টেন এলাকার প্রতিটি শিশুর গুণগত শিক্ষা নিশ্চিত করতে প্রতিশ্রুতিবদ্ধ।</p></div>", unsafe_allow_html=True)
-        st.image("https://ckgghs.edu.bd/uploads/sliders/1709444391.jpg", caption="আমাদের ক্যাম্পাস (নমুনা ছবি)")
+    col_main, col_side = st.columns([2, 1])
+    
+    with col_main:
+        st.markdown("### প্রধান শিক্ষকের বাণী")
+        c1, c2 = st.columns([1, 2])
+        with c1:
+            st.image("https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_10.jpg", width=200)
+        with c2:
+            st.write("শিক্ষাই জাতির মেরুদণ্ড। সানরাইজ কিন্ডারগার্টেন প্রতিটি শিশুর মেধা বিকাশে নিরলস কাজ করে যাচ্ছে। আমাদের লক্ষ্য আধুনিক ও নৈতিক শিক্ষার সমন্বয়।")
+        
+        st.markdown("---")
+        st.markdown("### আমাদের লক্ষ্য")
+        st.write("আমরা বিশ্বাস করি প্রতিটি শিশু অনন্য। তাদের সৃজনশীলতা এবং সুপ্ত প্রতিভা বিকাশের জন্য আমরা একটি চমৎকার পরিবেশ প্রদান করি।")
 
-    with col2:
-        st.markdown("<div class='card'><h3>জরুরি নোটিশ</h3><ul><li>ভর্তি ফরম বিতরণ শুরু</li><li>নতুন ইউনিফর্মের নির্দেশিকা</li><li>স্কুল ডায়েরি সংগ্রহ করুন</li></ul></div>", unsafe_allow_html=True)
+    with col_side:
+        st.markdown("<div class='notice-board'>📢 নোটিশ বোর্ড</div>", unsafe_allow_html=True)
+        st.info("📌 ২০২৫ শিক্ষাবর্ষের ভর্তি ফরম পাওয়া যাচ্ছে।")
+        st.info("📌 বার্ষিক পরীক্ষার রুটিন প্রকাশিত হয়েছে।")
+        st.info("📌 স্কুল ইউনিফর্ম সংক্রান্ত নতুন নির্দেশনা।")
 
-# --- ২. অনলাইন ভর্তি (আপনার ছবির নমুনা অনুযায়ী) ---
+# --- ২. অনলাইন ভর্তি (Screenshot_7/Form অনুযায়ী) ---
 elif choice == "📝 অনলাইন ভর্তি":
     st.title("📝 অনলাইন ভর্তি আবেদন")
-    with st.form("admission_form", clear_on_submit=True):
-        st.info("সঠিক তথ্য দিয়ে ফরমটি পূরণ করুন (ছবিতে দেওয়া তথ্য অনুযায়ী)")
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    with st.form("admission", clear_on_submit=True):
         c1, c2 = st.columns(2)
-        n_bn = c1.text_input("১। শিক্ষার্থীর নাম (বাংলা)")
-        n_en = c2.text_input("Student Name (English Block)")
-        f_bn = c1.text_input("২। পিতার নাম (বাংলা)")
-        m_bn = c2.text_input("৪। মাতার নাম (বাংলা)")
-        s_class = c1.selectbox("ভর্তির শ্রেণী", ["Play", "Nursery", "One", "Two", "Three", "Four", "Five"])
-        phone = c2.text_input("মোবাইল নম্বর (জরুরি)")
-        addr = st.text_area("ঠিকানা (গ্রাম, ডাকঘর, উপজেলা, জেলা)")
+        with c1:
+            n_bn = st.text_input("১। শিক্ষার্থীর নাম (বাংলা)")
+            f_bn = st.text_input("২। পিতার নাম (বাংলা)")
+            m_bn = st.text_input("৪। মাতার নাম (বাংলা)")
+            s_class = st.selectbox("ভর্তির শ্রেণী", ["Play", "Nursery", "One", "Two", "Three", "Four", "Five"])
+        with c2:
+            n_en = st.text_input("Student Name (English Block)")
+            f_en = st.text_input("Father's Name (Block)")
+            m_en = st.text_input("Mother's Name (Block)")
+            mobile = st.text_input("মোবাইল নম্বর")
+        
+        addr = st.text_area("৫। ঠিকানা (গ্রাম, ডাকঘর, উপজেলা, জেলা)")
         
         if st.form_submit_button("আবেদন জমা দিন"):
             df = load_data("students.csv", STD_COLS)
             new_id = 202500 + len(df) + 1
-            new_data = pd.DataFrame([[new_id, n_bn, n_en, f_bn, m_bn, s_class, phone, addr, str(date.today())]], columns=STD_COLS)
-            df = pd.concat([df, new_data], ignore_index=True)
+            new_row = pd.DataFrame([[new_id, n_bn, n_en, f_bn, m_bn, s_class, mobile, addr, str(date.today())]], columns=STD_COLS)
+            df = pd.concat([df, new_row], ignore_index=True)
             df.to_csv("students.csv", index=False)
-            st.success(f"আপনার আবেদন সফল হয়েছে। আপনার আইডি: {new_id}")
+            st.success(f"আবেদন সফল! আপনার আইডি: {new_id}")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# --- ৩. অ্যাডমিন সেকশন (লগইন প্রয়োজন) ---
-elif choice == "👤 অ্যাডমিন লগইন":
-    if 'logged_in' not in st.session_state: st.session_state['logged_in'] = False
+# --- ৩. অ্যাডমিন প্যানেল (এডিট/ডিলিট অপশনসহ) ---
+elif choice == "🔐 অ্যাডমিন প্যানেল":
+    if 'auth' not in st.session_state: st.session_state['auth'] = False
     
-    if not st.session_state['logged_in']:
-        user = st.text_input("অ্যাডমিন ইউজার")
-        pw = st.text_input("পাসওয়ার্ড", type="password")
-        if st.button("লগইন"):
+    if not st.session_state['auth']:
+        user = st.text_input("Admin User")
+        pw = st.text_input("Password", type="password")
+        if st.button("Login"):
             if user == "admin" and pw == "12345":
-                st.session_state['logged_in'] = True
+                st.session_state['auth'] = True
                 st.rerun()
-            else: st.error("ভুল তথ্য!")
     else:
-        st.title("📊 ম্যানেজমেন্ট ড্যাশবোর্ড")
+        st.title("📊 শিক্ষার্থী ডাটাবেস")
         df = load_data("students.csv", STD_COLS)
-        st.metric("মোট শিক্ষার্থী", len(df))
         st.dataframe(df, use_container_width=True)
-        if st.button("Logout"):
-            st.session_state['logged_in'] = False
+        
+        st.markdown("### তথ্য সংশোধন/মুছে ফেলা")
+        del_id = st.number_input("শিক্ষার্থীর আইডি দিন", min_value=0)
+        if st.button("তথ্য ডিলিট করুন"):
+            df = df[df['ID'] != del_id]
+            df.to_csv("students.csv", index=False)
+            st.warning(f"আইডি {del_id} মুছে ফেলা হয়েছে।")
             st.rerun()
+        
+        if st.button("Logout"):
+            st.session_state['auth'] = False
+            st.rerun()
+
+# --- ফুটার সেকশন (Screenshot_11 অনুযায়ী) ---
+st.markdown(f"""
+    <div class="footer">
+        <div style="display: flex; justify-content: space-between;">
+            <div style="width: 30%;">
+                <img src="https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg" width="60">
+                <p>© ২০২৬ সর্বস্বত্ব সংরক্ষিত <br> সানরাইজ কিন্ডারগার্টেন</p>
+            </div>
+            <div style="width: 30%;">
+                <h4>যোগাযোগ</h4>
+                <p>হূমাইপুর, বাজিতপুর, কিশোরগঞ্জ<br>মোবাইল: +৮৮০ ১৭২৭-৪১৪১৩৪<br>ইমেইল: info@sunrise.edu.bd</p>
+            </div>
+            <div style="width: 30%;">
+                <h4>প্রয়োজনীয় লিংক</h4>
+                <p>মাধ্যমিক ও উচ্চশিক্ষা অধিদপ্তর<br>দিনাজপুর শিক্ষা বোর্ড<br>শিক্ষক বাতায়ন</p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
