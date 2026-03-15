@@ -15,116 +15,119 @@ def load_data(file_name, columns):
 # পেজ সেটআপ
 st.set_page_config(page_title="Sun Rise Kinder Garten", layout="wide")
 
-# --- সেশন স্টেট (লগইন ও স্লাইড কন্ট্রোল) ---
-if 'logged_in' not in st.session_state:
-    st.session_state.logged_in = False
-if 'show_comment' not in st.session_state:
-    st.session_state.show_comment = False
-if 'show_login' not in st.session_state:
-    st.session_state.show_login = False
+# --- সেশন স্টেট ও টগল হ্যান্ডলিং ---
+if 'show_comment' not in st.session_state: st.session_state.show_comment = False
+if 'show_login' not in st.session_state: st.session_state.show_login = False
+if 'logged_in' not in st.session_state: st.session_state.logged_in = False
 
 def toggle_comment():
     st.session_state.show_comment = not st.session_state.show_comment
     st.session_state.show_login = False
 
 def toggle_login():
-    st.session_state.show_login = not st.session_state.show_login
-    st.session_state.show_comment = False
+    if st.session_state.logged_in: # লগইন থাকলে বাটন ক্লিক করলে লগআউট হবে
+        st.session_state.logged_in = False
+        st.rerun()
+    else:
+        st.session_state.show_login = not st.session_state.show_login
+        st.session_state.show_comment = False
 
 # --- কাস্টম ডিজাইন (CSS) ---
 st.markdown("""
     <style>
-    .school-title-bn { color: #ff3b30; font-size: 35px; font-weight: bold; line-height: 1.1; }
+    .slide-down-container { background-color: #000; padding: 25px 50px; color: white; border-bottom: 4px solid #ff3b30; }
+    .school-title-bn { color: #ff3b30; font-size: 35px; font-weight: bold; }
     .school-title-en { color: #2e7d32; font-size: 20px; font-weight: bold; }
-    /* ডান পাশে ছোট স্লাইড বক্স */
-    .slide-panel {
-        background-color: #000;
-        padding: 15px;
-        color: white;
-        border-radius: 0 0 0 10px;
-        border-left: 3px solid #ff3b30;
-        margin-bottom: 10px;
-    }
-    .stButton>button { border-radius: 5px; }
+    .footer { background: #111; color: #888; padding: 20px; text-align: center; margin-top: 50px; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ১. ডান পাশের স্লাইড বাটন ও প্যানেল ---
-col_main_top, col_side_top = st.columns([7, 3])
+# --- ১. টপ বাটন বার ---
+col_empty, col_btns = st.columns([8, 2])
+with col_btns:
+    c1, c2 = st.columns(2)
+    c1.button("মন্তব্য ▼", on_click=toggle_comment)
+    login_label = "লগ আউট" if st.session_state.logged_in else "লগ ইন ▼"
+    c2.button(login_label, on_click=toggle_login)
 
-with col_side_top:
-    b1, b2 = st.columns(2)
-    b1.button("মন্তব্য ▼", on_click=toggle_comment, use_container_width=True)
-    b2.button("লগ ইন ▼", on_click=toggle_login, use_container_width=True)
+# --- ২. স্লাইড ডাউন সেকশন (ভিডিও অনুযায়ী) ---
 
-    # মন্তব্য স্লাইড প্যানেল
-    if st.session_state.show_comment:
-        st.markdown('<div class="slide-panel">', unsafe_allow_html=True)
-        st.write("💬 মতামত দিন")
-        st.text_input("নাম :", key="u_name")
-        st.text_input("ফোন :", key="u_phone")
-        st.text_area("মন্তব্য :", key="u_msg")
+# মন্তব্য সেকশন
+if st.session_state.show_comment:
+    with st.container():
+        st.markdown('<div class="slide-down-container">', unsafe_allow_html=True)
+        st.write("### 💬 আপনার মন্তব্য দিন")
+        st.text_input("নাম :")
+        st.text_area("আপনার মতামত :")
         st.button("পাঠান", type="primary")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # লগইন স্লাইড প্যানেল
-    if st.session_state.show_login:
-        st.markdown('<div class="slide-panel">', unsafe_allow_html=True)
-        st.write("🔐 অ্যাডমিন লগইন")
-        user = st.text_input("ইউজার :")
-        pw = st.text_input("পাসওয়ার্ড :", type="password")
-        if st.button("লগইন করুন"):
-            if user == "admin" and pw == "12345":
+# লগইন সেকশন
+if st.session_state.show_login and not st.session_state.logged_in:
+    with st.container():
+        st.markdown('<div class="slide-down-container">', unsafe_allow_html=True)
+        st.write("### 🔐 অ্যাডমিন লগইন")
+        l_user = st.text_input("ব্যবহারকারী নাম :")
+        l_pass = st.text_input("গোপন নং :", type="password")
+        if st.button("প্রবেশ করুন"):
+            if l_user == "admin" and l_pass == "12345":
                 st.session_state.logged_in = True
-                st.success("লগইন সফল!")
+                st.session_state.show_login = False
                 st.rerun()
             else:
                 st.error("ভুল তথ্য!")
         st.markdown('</div>', unsafe_allow_html=True)
 
-# --- ২. হেডার (লোগো ও নাম) ---
-h_l, h_r = st.columns([1, 6])
-with h_l:
-    st.image("https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg", width=100)
-with h_r:
+# --- ৩. হেডার (লোগো ও নাম) ---
+header_l, header_r = st.columns([1, 5])
+with header_l:
+    st.image("https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_9.jpg", width=110)
+with header_r:
     st.markdown("""
-        <div style='margin-top: 10px;'>
+        <div style='margin-left: -40px;'>
             <div class="school-title-bn">সানরাইজ কিন্ডারগার্টেন</div>
             <div class="school-title-en">SUN RISE KINDER GARTEN</div>
         </div>
         """, unsafe_allow_html=True)
 
-# --- ৩. মেনু এবং অ্যাডমিন ম্যানেজমেন্ট ---
-menu = ["হোম পেজ", "স্কুল প্রশাসন", "প্রাতিষ্ঠানিক কার্যক্রম", "অনলাইন ভর্তি", "রেজাল্ট"]
+# --- ৪. মেনু নেভিগেশন (লগইন থাকলে বাড়তি ট্যাব আসবে) ---
+menu_items = ["হোম পেজ", "অনলাইন ভর্তি", "রেজাল্ট অনুসন্ধান"]
 if st.session_state.logged_in:
-    menu.append("⚙️ ম্যানেজমেন্ট প্যানেল")
+    menu_items.append("📊 তথ্য আপডেট/ম্যানেজ")
 
-tabs = st.tabs(menu)
+tabs = st.tabs(menu_items)
 
-# --- ৪. হোম পেজ ---
-with tabs[0]:
-    c_left, c_right = st.columns([2.5, 1])
-    with c_left:
-        st.image("https://ckgghs.edu.bd/uploads/sliders/1709444391.jpg", use_container_width=True)
-        st.markdown("### স্বাগতম!")
-        st.write("শিক্ষাই শক্তি, জ্ঞানই আলো।")
-    with c_right:
-        st.info("📢 নোটিশ: ২০২৬ শিক্ষাবর্ষের ভর্তি চলছে।")
-        st.image("https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_10.jpg", width=150)
-
-# --- ৫. ম্যানেজমেন্ট প্যানেল (লগইন করলেই অপশন ম্যানেজ করা যাবে) ---
+# --- ৫. অ্যাডমিন ম্যানেজমেন্ট ট্যাব (তথ্য আপডেট করার জন্য) ---
 if st.session_state.logged_in:
     with tabs[-1]:
-        st.header("⚙️ স্কুল ম্যানেজমেন্ট সিস্টেম")
-        option = st.selectbox("কি ম্যানেজ করতে চান?", ["ভর্তি তালিকা", "শিক্ষক তথ্য", "নোটিশ আপডেট"])
+        st.header("🛠 ওয়েবসাইট ম্যানেজমেন্ট প্যানেল")
         
-        if option == "ভর্তি তালিকা":
-            st.write("এখানে সকল শিক্ষার্থীর তথ্য দেখা যাবে।")
-            # ডাটাবেস থেকে তথ্য লোড করার কোড এখানে হবে
+        manage_option = st.selectbox("কি আপডেট করতে চান?", ["নোটিশ বোর্ড", "ভর্তি আবেদন তালিকা", "শিক্ষক তালিকা"])
         
-        if st.button("লগ আউট"):
-            st.session_state.logged_in = False
-            st.rerun()
+        if manage_option == "নোটিশ বোর্ড":
+            new_notice = st.text_area("নতুন নোটিশ লিখুন:")
+            if st.button("নোটিশ আপডেট করুন"):
+                st.success("নোটিশ সফলভাবে আপডেট হয়েছে!")
+        
+        elif manage_option == "ভর্তি আবেদন তালিকা":
+            # এখানে csv থেকে ডাটা লোড হবে
+            df_students = load_data("students.csv", ["ID", "Name", "Class", "Phone"])
+            st.dataframe(df_students, use_container_width=True)
+            if st.button("তালিকা ডাউনলোড (Excel)"):
+                st.info("ডাউনলোড শুরু হচ্ছে...")
 
-# --- ৬. ফুটার ---
-st.markdown('<div style="text-align:center; padding:20px; color:#666;">© ২০২৬ সানরাইজ কিন্ডারগার্টেন | বাজিতপুর, কিশোরগঞ্জ।</div>', unsafe_allow_html=True)
+# --- ৬. হোম পেজ ---
+with tabs[0]:
+    col_main, col_side = st.columns([2.5, 1])
+    with col_main:
+        st.image("https://ckgghs.edu.bd/uploads/sliders/1709444391.jpg", use_container_width=True)
+        st.markdown("### স্বাগতম!")
+        st.write("সানরাইজ কিন্ডারগার্টেনে আধুনিক প্রযুক্তির মাধ্যমে পাঠদান নিশ্চিত করা হয়।")
+    
+    with col_side:
+        st.markdown('<div style="background:#76ba1b; color:white; padding:10px;">📢 নোটিশ বোর্ড</div>', unsafe_allow_html=True)
+        st.info("📌 ২০২৬ শিক্ষাবর্ষের ভর্তি চলছে।")
+        st.image("https://raw.githubusercontent.com/alaminkhan0012-debug/sunrise-school-management/main/Screenshot_10.jpg", width=150)
+
+# --- ৭. ফুটার ---
+st.markdown('<div class="footer">© ২০২৬ সানরাইজ কিন্ডারগার্টেন | হূমাইপুর, বাজিতপুর, কিশোরগঞ্জ।</div>', unsafe_allow_html=True)
